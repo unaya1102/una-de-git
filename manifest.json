@@ -1,0 +1,18 @@
+{
+  "name": "한자어 외괘 · 汉字词外挂",
+  "short_name": "汉字词外挂",
+  "description": "面向中文母语者的韩语汉字词推导 + 间隔重复背词工具",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f1115",
+  "theme_color": "#0f1115",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='192' height='192' rx='40' fill='%235b8cff'/%3E%3Ctext x='96' y='128' font-size='110' text-anchor='middle' fill='white' font-family='sans-serif'%3E漢%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

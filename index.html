@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f1115">
+<link rel="manifest" href="manifest.json">
+<title>한자어 외괘 · 汉字词外挂</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#1a1e27; --card2:#232838; --fg:#e9edf5; --muted:#8b93a7;
+    --accent:#5b8cff; --good:#2ecc71; --bad:#ff5d6c; --easy:#a78bfa; --line:#2a3040;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR","Segoe UI",sans-serif;
+    display:flex;flex-direction:column;min-height:100vh;overscroll-behavior:none}
+  header{padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  header h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.5px}
+  header .sub{font-size:11px;color:var(--muted)}
+  .progress{font-size:12px;color:var(--muted);text-align:right;line-height:1.4}
+  .progress b{color:var(--accent)}
+  main{flex:1;padding:0 16px 90px;max-width:680px;margin:0 auto;width:100%}
+  .tab{display:none}
+  .tab.active{display:block}
+
+  /* study card */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:26px 20px;margin-top:8px;min-height:300px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center}
+  .face-tag{font-size:11px;color:var(--muted);margin-bottom:18px;letter-spacing:1px}
+  .hanja{font-size:64px;font-weight:700;line-height:1.1;letter-spacing:4px}
+  .hangul-big{font-size:52px;font-weight:700;line-height:1.1}
+  .hint{font-size:13px;color:var(--muted);margin-top:14px;min-height:18px}
+  .reveal{margin-top:8px;width:100%;animation:fade .18s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+  .reveal .hangul{font-size:40px;font-weight:700}
+  .reveal .mean{font-size:22px;margin-top:6px;color:var(--fg)}
+  .reveal .roman{font-size:13px;color:var(--muted);margin-top:2px}
+  .chars{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
+  .chip{background:var(--card2);border:1px solid var(--line);border-radius:12px;
+    padding:8px 10px;min-width:56px}
+  .chip .ch{font-size:22px;font-weight:700}
+  .chip .ck{font-size:15px;color:var(--accent);margin-top:2px}
+  .chip .cm{font-size:11px;color:var(--muted)}
+
+  .btns{position:fixed;left:0;right:0;bottom:64px;display:flex;gap:8px;
+    padding:8px 16px;max-width:680px;margin:0 auto}
+  .btns button{flex:1;border:none;border-radius:14px;padding:15px 0;font-size:15px;
+    font-weight:700;color:#0f1115}
+  .b-show{background:var(--accent);color:#fff}
+  .b-bad{background:var(--bad);color:#fff}
+  .b-good{background:var(--good);color:#063}
+  .b-easy{background:var(--easy);color:#fff}
+  .sub-int{display:block;font-size:10px;font-weight:600;opacity:.85;margin-top:2px}
+
+  .empty{text-align:center;color:var(--muted);margin-top:60px;line-height:1.7}
+  .empty .em{font-size:40px}
+
+  /* face switch */
+  .faceswitch{display:flex;gap:6px;margin-top:12px;background:var(--card2);
+    border-radius:12px;padding:4px}
+  .faceswitch button{flex:1;border:none;background:transparent;color:var(--muted);
+    padding:9px 0;border-radius:9px;font-size:13px;font-weight:600}
+  .faceswitch button.on{background:var(--accent);color:#fff}
+
+  /* table */
+  .group{margin-top:18px}
+  .group h3{font-size:13px;color:var(--accent);margin:0 0 8px;letter-spacing:1px}
+  .htable{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px}
+  .hcell{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:10px 6px;text-align:center}
+  .hcell .h{font-size:26px;font-weight:700}
+  .hcell .k{font-size:16px;color:var(--accent);margin-top:2px}
+  .hcell .m{font-size:11px;color:var(--muted)}
+
+  /* stats / settings */
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .stat .n{font-size:28px;font-weight:800;color:var(--accent)}
+  .stat .l{font-size:12px;color:var(--muted);margin-top:2px}
+  .row{display:flex;align-items:center;justify-content:space-between;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:14px;margin-top:10px}
+  .row label{font-size:14px}
+  .row input{width:72px;background:var(--card2);border:1px solid var(--line);
+    color:var(--fg);border-radius:8px;padding:8px;font-size:15px;text-align:center}
+  .row .desc{font-size:11px;color:var(--muted);margin-top:3px}
+  .danger{background:transparent;border:1px solid var(--bad);color:var(--bad);
+    border-radius:12px;padding:12px;width:100%;margin-top:18px;font-size:14px;font-weight:600}
+  .note{font-size:12px;color:var(--muted);line-height:1.7;margin-top:18px;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+
+  /* bottom nav */
+  nav{position:fixed;bottom:0;left:0;right:0;height:64px;background:#11141c;
+    border-top:1px solid var(--line);display:flex;max-width:680px;margin:0 auto}
+  nav button{flex:1;background:none;border:none;color:var(--muted);font-size:11px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+  nav button .ic{font-size:20px}
+  nav button.on{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>한자어 외괘</h1><div class="sub">汉字词外挂 · 中文母语者专属</div></div>
+  <div class="progress" id="prog"></div>
+</header>
+
+<main>
+  <!-- STUDY -->
+  <section class="tab active" id="tab-study">
+    <div class="faceswitch" id="faceSwitch">
+      <button data-face="hanja" class="on">汉字 → 推读音/意思</button>
+      <button data-face="hangul">한글 → 推意思</button>
+    </div>
+    <div id="studyArea"></div>
+  </section>
+
+  <!-- TABLE -->
+  <section class="tab" id="tab-table"></section>
+
+  <!-- STATS -->
+  <section class="tab" id="tab-stats">
+    <div class="stat-grid">
+      <div class="stat"><div class="n" id="s-total">0</div><div class="l">词库总数</div></div>
+      <div class="stat"><div class="n" id="s-learned">0</div><div class="l">已开始学</div></div>
+      <div class="stat"><div class="n" id="s-due">0</div><div class="l">今天待复习</div></div>
+      <div class="stat"><div class="n" id="s-mature">0</div><div class="l">已稳固(≥7天)</div></div>
+    </div>
+    <div class="row">
+      <div><label>每天新词上限</label><div class="desc">出差路上建议 20~40，先找你的真实上限</div></div>
+      <input type="number" id="newPerDay" min="0" max="500" step="5">
+    </div>
+    <div class="note">
+      <b>用法（再认导向）</b><br>
+      1. 第一遍只求"眼熟"，别纠结拼写发音。<br>
+      2. 没认出就点「몰라요」，它会被拎回来重背（这就是你说的"记不住的挑出来"）。<br>
+      3. 复习时间点交给算法，按 5分→1天→2天→4天→7天→15天→30天 滚动。<br>
+      4. 先用「汉字→推读音」练你的母语外挂，再用「한글→推意思」练实战再认。<br>
+      5. 数据存在本机浏览器，<b>断网照常用</b>；换设备不会同步。
+    </div>
+    <button class="danger" id="resetBtn">清空所有学习进度</button>
+  </section>
+</main>
+
+<div class="btns" id="btns"></div>
+
+<nav>
+  <button data-tab="study" class="on"><span class="ic">📚</span>학습</button>
+  <button data-tab="table"><span class="ic">🀄</span>한자음표</button>
+  <button data-tab="stats"><span class="ic">📊</span>통계</button>
+</nav>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }
+</script>
+</body>
+</html>
