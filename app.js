@@ -20,7 +20,7 @@ function load(){
   s.newToday = s.newToday || 0;
   return s;
 }
-function save(){ localStorage.setItem(STORE, JSON.stringify(state)); }
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify(state)); }catch(e){} }
 
 let state = load();
 let queue = [];
