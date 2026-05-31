@@ -16,10 +16,13 @@ function load(){
   s.cards    = s.cards    || {};
   s.settings = s.settings || { newPerDay: 20 };
   s.face     = s.face     || 'hanja';
+  s.hardPool = s.hardPool || [];   // 反复记不住的词(汉字)，按进入顺序
+  s.stories  = s.stories  || {};   // 已生成故事缓存：groupKey -> {text, seed}
   if(s.day !== todayStr()){ s.day = todayStr(); s.newToday = 0; }
   s.newToday = s.newToday || 0;
   return s;
 }
+const LAPSE_THRESHOLD = 3;   // 点几次「不会」算反复记不住
 function save(){ try{ localStorage.setItem(STORE, JSON.stringify(state)); }catch(e){} }
 
 let state = load();
@@ -70,6 +73,10 @@ function rate(kind){
 
   if(kind==='again'){
     c.box = 0; c.lapses++; c.due = now + INT[0]*DAY;
+    // 反复记不住 → 进入「需要记忆」池
+    if(c.lapses >= LAPSE_THRESHOLD && !state.hardPool.includes(hanja)){
+      state.hardPool.push(hanja);
+    }
   } else if(kind==='good'){
     c.box = Math.min((wasNew?0:c.box)+1, MAXBOX); c.due = now + INT[c.box]*DAY;
   } else if(kind==='easy'){
@@ -85,7 +92,7 @@ function rate(kind){
   }
   if(queue.length === 0) buildQueue();
   revealed = false;
-  renderStudy(); renderProgress();
+  renderStudy(); renderProgress(); renderStoryBadge();
 }
 
 /* ---------- 渲染：学习 ---------- */
@@ -178,6 +185,112 @@ function renderProgress(){
   document.getElementById('s-mature').textContent  = mature;
 }
 
+/* ---------- 故事记忆 ---------- */
+// 简单可复现的伪随机（带种子），方便“换个故事”
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+// 离谱故事的模板：每句一个“坑”，把单词塞进去。够离谱、画面感强、无复杂语法。
+const STORY_FRAMES = [
+  '有一天，一只会说话的猫突然抱住了【】，吓得满街人尖叫。',
+  '它把【】顶在头上，像戴了顶发光的帽子，到处跑。',
+  '路边的大象看见了，立刻用鼻子卷起【】，塞进自己耳朵里。',
+  '突然天上掉下一个巨大的【】，正好砸在西瓜摊上，汁水四溅。',
+  '一个穿睡衣的老爷爷骑着扫把飞过，怀里还紧紧抱着【】。',
+  '河里的鱼跳出水面，嘴里居然吐出一个闪闪发光的【】。',
+  '机器人保安跑过来，非要检查每个人的【】，否则不让进门。',
+  '这时一阵怪风把所有【】都吹上了天，像气球一样飘走。',
+  '广场中央的喷泉突然喷出彩色的【】，小孩们笑着去接。',
+  '最后，月亮裂开一条缝，从里面滚出最大的一个【】，全城轰动。',
+];
+
+function storyGroups(){
+  // 把 hardPool 按 10 个一组切分
+  const groups=[];
+  for(let i=0;i<state.hardPool.length;i+=10){
+    groups.push(state.hardPool.slice(i,i+10));
+  }
+  return groups;
+}
+
+function buildStory(hanjaList, seed){
+  const rand=mulberry32(seed>>>0);
+  // 用种子打乱句子顺序（Fisher-Yates），让“换个故事”每次都明显不同
+  const frames=STORY_FRAMES.slice();
+  for(let i=frames.length-1;i>0;i--){
+    const j=Math.floor(rand()*(i+1));
+    [frames[i],frames[j]]=[frames[j],frames[i]];
+  }
+  const parts=[];
+  hanjaList.forEach((hanja,idx)=>{
+    const w=WORDS.find(x=>x.hanja===hanja);
+    if(!w) return;
+    const frame=frames[idx%frames.length];
+    const slot=`<span class="w">${w.mean}</span>（<span class="wk">${w.hangul}</span>）`;
+    parts.push(frame.replace('【】',slot));
+  });
+  return parts.join('');
+}
+
+function renderStory(){
+  const el=document.getElementById('tab-story');
+  const groups=storyGroups();
+  if(groups.length===0){
+    el.innerHTML=`<div class="story-intro">
+      <b>📖 故事记忆区</b><br><br>
+      当你对同一个词点了 <b>${LAPSE_THRESHOLD} 次「몰라요(不会)」</b>，它就会自动进到这里。<br>
+      每攒够 <b>10 个</b>顽固词，就自动编成一个<b>离谱小故事</b>，把词义和韩文都塞进剧情里，方便你靠画面记住。<br><br>
+      现在还没有顽固词——继续在「학습」里背，记不住的会自己跑来这儿。</div>`;
+    return;
+  }
+  let html=`<div class="story-intro">这里是反复记不住的词，编成离谱故事帮你记。读的时候<b>在脑子里把画面演一遍</b>，越夸张越好记。记住了就点「这组记住了」移走。</div>`;
+  groups.forEach((g,gi)=>{
+    const key='g'+gi+'_'+g.join('');
+    if(!state.stories[key]) state.stories[key]={seed:(gi+1)*7919};
+    const seed=state.stories[key].seed;
+    const text=buildStory(g, seed);
+    const legend=g.map(hanja=>{
+      const w=WORDS.find(x=>x.hanja===hanja);
+      if(!w) return '';
+      return `<div class="li"><span class="lh">${w.hanja}</span><span class="lk">${w.hangul}</span><span class="lm">${w.mean}</span></div>`;
+    }).join('');
+    html+=`<div class="story-card">
+      <h3>故事 ${gi+1} · 共 ${g.length} 词</h3>
+      <div class="story-text">${text}</div>
+      <div class="story-legend">${legend}</div>
+      <div class="story-actions">
+        <button class="sa-reroll" onclick="rerollStory('${key}')">🎲 换个故事</button>
+        <button class="sa-done" onclick="storyDone(${gi})">✅ 这组记住了</button>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+function rerollStory(key){
+  if(!state.stories[key]) state.stories[key]={seed:1};
+  state.stories[key].seed = Math.floor(Math.random()*1e9);
+  save(); renderStory();
+}
+
+function storyDone(groupIndex){
+  // 移除该组的 10 个词
+  const start=groupIndex*10;
+  const removed=state.hardPool.slice(start,start+10);
+  state.hardPool.splice(start,10);
+  // 清掉相关故事缓存
+  state.stories={};
+  save();
+  renderStory(); renderStoryBadge();
+}
+
+function renderStoryBadge(){
+  const badge=document.getElementById('storyBadge');
+  if(!badge) return;
+  const n=state.hardPool.length;
+  if(n>0){ badge.textContent=n; badge.classList.add('show'); }
+  else{ badge.classList.remove('show'); }
+}
+
 /* ---------- 渲染：汉字音表 ---------- */
 function renderTable(){
   const el = document.getElementById('tab-table');
@@ -198,6 +311,7 @@ function showTab(name){
   btns.style.display = (name==='study') ? 'flex' : 'none';
   if(name==='study'){ buildQueue(); renderStudy(); }
   if(name==='stats'){ renderProgress(); }
+  if(name==='story'){ renderStory(); }
 }
 
 document.querySelectorAll('nav button').forEach(b=>
@@ -221,7 +335,7 @@ document.getElementById('resetBtn').addEventListener('click', ()=>{
   if(confirm('确定清空所有学习进度？此操作不可恢复。')){
     localStorage.removeItem(STORE); state = load();
     npd.value = state.settings.newPerDay;
-    buildQueue(); renderStudy(); renderProgress(); showTab('study');
+    buildQueue(); renderStudy(); renderProgress(); renderStoryBadge(); showTab('study');
   }
 });
 
@@ -232,3 +346,4 @@ renderTable();
 buildQueue();
 renderStudy();
 renderProgress();
+renderStoryBadge();

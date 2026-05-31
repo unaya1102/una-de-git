@@ -99,6 +99,31 @@
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
   nav button .ic{font-size:20px}
   nav button.on{color:var(--accent)}
+  nav button{position:relative}
+  .navbadge{position:absolute;top:6px;right:calc(50% - 26px);background:var(--bad);
+    color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;line-height:16px;
+    border-radius:8px;padding:0 4px;display:none}
+  .navbadge.show{display:block}
+
+  /* story */
+  .story-intro{font-size:12px;color:var(--muted);line-height:1.7;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:14px}
+  .story-card{background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:18px;margin-top:14px}
+  .story-card h3{margin:0 0 6px;font-size:14px;color:var(--accent)}
+  .story-text{font-size:17px;line-height:2.05;color:var(--fg)}
+  .story-text .w{color:var(--easy);font-weight:700}
+  .story-text .wk{color:var(--accent);font-weight:700}
+  .story-legend{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  .story-legend .li{display:flex;align-items:baseline;gap:8px;font-size:14px;padding:5px 0}
+  .story-legend .li .lh{font-weight:700;min-width:54px}
+  .story-legend .li .lk{color:var(--accent);font-weight:700;min-width:60px}
+  .story-legend .li .lm{color:var(--muted)}
+  .story-actions{display:flex;gap:8px;margin-top:14px}
+  .story-actions button{flex:1;border:none;border-radius:12px;padding:13px 0;
+    font-size:14px;font-weight:700}
+  .sa-reroll{background:var(--card2);color:var(--fg);border:1px solid var(--line)}
+  .sa-done{background:var(--good);color:#063}
 </style>
 </head>
 <body>
@@ -116,6 +141,9 @@
     </div>
     <div id="studyArea"></div>
   </section>
+
+  <!-- STORY -->
+  <section class="tab" id="tab-story"></section>
 
   <!-- TABLE -->
   <section class="tab" id="tab-table"></section>
@@ -148,6 +176,7 @@
 
 <nav>
   <button data-tab="study" class="on"><span class="ic">📚</span>학습</button>
+  <button data-tab="story"><span class="ic">📖</span>故事<span id="storyBadge" class="navbadge"></span></button>
   <button data-tab="table"><span class="ic">🀄</span>한자음표</button>
   <button data-tab="stats"><span class="ic">📊</span>통계</button>
 </nav>
