@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>형용사 40 · 词卡</title>
+</head>
+<body>
+<style>
+:root{
+  --paper:#E9E7E1; --card:#FCFBF9; --ink:#17171B; --ink2:#56555C;
+  --line:#C9C6BE; --line2:#DEDBD4; --seal:#C33C22; --blue:#2E5A8A;
+  --ok:#3F6B4A; --sealbg:rgba(195,60,34,.10); --shadow:rgba(23,23,27,.22);
+  --kr:'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic','Nanum Gothic',system-ui,sans-serif;
+  --cn:'Songti SC','Noto Serif CJK SC','Noto Serif SC','SimSun',serif;
+  --ui:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#131315; --card:#1C1C20; --ink:#EAE8E2; --ink2:#93919A;
+    --line:#34343A; --line2:#26262B; --seal:#E4674A; --blue:#7FA9D6;
+    --ok:#7FB48C; --sealbg:rgba(228,103,74,.14); --shadow:rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131315; --card:#1C1C20; --ink:#EAE8E2; --ink2:#93919A;
+  --line:#34343A; --line2:#26262B; --seal:#E4674A; --blue:#7FA9D6;
+  --ok:#7FB48C; --sealbg:rgba(228,103,74,.14); --shadow:rgba(0,0,0,.55);
+}
+:root[data-theme="light"]{
+  --paper:#E9E7E1; --card:#FCFBF9; --ink:#17171B; --ink2:#56555C;
+  --line:#C9C6BE; --line2:#DEDBD4; --seal:#C33C22; --blue:#2E5A8A;
+  --ok:#3F6B4A; --sealbg:rgba(195,60,34,.10); --shadow:rgba(23,23,27,.22);
+}
+
+*{box-sizing:border-box}
+.wrap{
+  background:var(--paper); color:var(--ink); font-family:var(--ui);
+  min-height:100dvh; margin:0 auto; padding:18px 16px calc(24px + env(safe-area-inset-bottom));
+  max-width:600px; display:flex; flex-direction:column; gap:16px;
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit; color:inherit; cursor:pointer; background:none; border:none}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--seal); outline-offset:3px}
+
+/* ---- header ---- */
+.top{display:flex; align-items:baseline; justify-content:space-between; gap:12px; border-bottom:1px solid var(--line); padding-bottom:10px}
+.brand{display:flex; align-items:baseline; gap:10px; min-width:0}
+.brand .t{font-family:var(--kr); font-size:20px; font-weight:700; letter-spacing:-.01em}
+.brand .n{font-family:var(--mono); font-size:12px; color:var(--ink2); letter-spacing:.06em}
+.viewbtn{font-size:13px; letter-spacing:.04em; color:var(--ink2); border-bottom:1px solid var(--line); padding-bottom:2px; white-space:nowrap}
+.viewbtn:hover{color:var(--ink); border-color:var(--ink)}
+
+/* ---- chips ---- */
+.bar{display:flex; flex-direction:column; gap:9px}
+.row{display:flex; gap:6px; flex-wrap:wrap; align-items:center}
+.lab{font-family:var(--mono); font-size:10px; letter-spacing:.14em; color:var(--ink2); text-transform:uppercase; width:100%; margin-bottom:-2px}
+.chip{
+  font-size:13px; padding:5px 11px; border:1px solid var(--line); border-radius:2px;
+  color:var(--ink2); background:var(--card); line-height:1.35;
+}
+.chip:hover{border-color:var(--ink2); color:var(--ink)}
+.chip.on{background:var(--ink); border-color:var(--ink); color:var(--paper)}
+.chip .c{font-family:var(--mono); font-size:10px; opacity:.6; margin-left:5px}
+.chip.kr{font-family:var(--kr)}
+
+/* ---- progress ---- */
+.meter{display:flex; align-items:center; gap:10px}
+.track{flex:1; height:3px; background:var(--line2); position:relative; overflow:hidden}
+.fill{position:absolute; inset:0 auto 0 0; background:var(--seal); width:0; transition:width .25s ease}
+.count{font-family:var(--mono); font-size:11px; color:var(--ink2); font-variant-numeric:tabular-nums; white-space:nowrap}
+
+/* ---- card ---- */
+.stage{perspective:1400px}
+.card{
+  display:block; width:100%; text-align:left; position:relative;
+  min-height:clamp(310px,54vh,430px);
+  transform-style:preserve-3d; transition:transform .42s cubic-bezier(.2,.75,.25,1);
+}
+.card.flip{transform:rotateY(180deg)}
+.face{
+  position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  background:var(--card); border:1px solid var(--ink); border-radius:3px;
+  box-shadow:4px 4px 0 var(--shadow);
+  padding:22px; display:flex; flex-direction:column;
+}
+.face.back{transform:rotateY(180deg); overflow-y:auto; gap:14px}
+
+.corner{display:flex; justify-content:space-between; align-items:flex-start; gap:10px}
+.idx{font-family:var(--mono); font-size:11px; color:var(--ink2); letter-spacing:.1em; font-variant-numeric:tabular-nums}
+.seal{
+  font-family:var(--kr); font-size:15px; font-weight:700; color:var(--seal);
+  border:1.5px solid var(--seal); background:var(--sealbg); border-radius:3px;
+  width:34px; height:34px; display:grid; place-items:center; transform:rotate(6deg); flex:none;
+}
+.seal.soft{color:var(--ink2); border-color:var(--line); background:none; transform:none; font-size:13px; font-weight:600}
+
+.mid{flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:12px; text-align:center; padding:6px 0}
+.word{font-family:var(--kr); font-size:clamp(2.5rem,11vw,3.9rem); font-weight:700; letter-spacing:-.03em; line-height:1.06; text-wrap:balance}
+.word.sm{font-size:clamp(2rem,8.5vw,3rem)}
+.mean{font-family:var(--cn); font-size:clamp(1.9rem,8vw,2.7rem); font-weight:600; line-height:1.15; text-wrap:balance}
+.ask{font-family:var(--mono); font-size:11px; letter-spacing:.16em; color:var(--seal); text-transform:uppercase}
+.hint{font-family:var(--mono); font-size:11px; letter-spacing:.1em; color:var(--ink2); text-align:center; margin-top:auto}
+
+/* ---- back detail ---- */
+.ansmean{font-family:var(--cn); font-size:clamp(1.6rem,6.5vw,2.1rem); font-weight:600; line-height:1.2}
+.answord{font-family:var(--kr); font-size:clamp(2rem,8vw,2.8rem); font-weight:700; letter-spacing:-.02em; line-height:1.1}
+.answord em{font-style:normal; color:var(--seal)}
+.headline{display:flex; flex-direction:column; gap:5px; align-items:center; text-align:center; padding-bottom:2px}
+.pron{font-family:var(--mono); font-size:12px; color:var(--ink2)}
+.grid{display:grid; grid-template-columns:auto 1fr; gap:7px 12px; align-items:baseline; border-top:1px solid var(--line2); padding-top:12px}
+.k{font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--ink2); text-transform:uppercase; white-space:nowrap}
+.v{font-family:var(--kr); font-size:17px; font-weight:600; line-height:1.35}
+.v em{font-style:normal; color:var(--seal)}
+.deriv{
+  font-family:var(--kr); font-size:15px; line-height:1.5; color:var(--ink);
+  border-left:2px solid var(--seal); background:var(--sealbg); padding:9px 12px; border-radius:0 2px 2px 0;
+}
+.deriv .rl{font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--seal); display:block; margin-bottom:3px; text-transform:uppercase}
+.ant{display:flex; align-items:center; justify-content:center; gap:10px; border-top:1px solid var(--line2); padding-top:11px; font-family:var(--kr); font-size:17px}
+.ant .ar{color:var(--ink2); font-size:14px}
+.ant .aw{font-weight:600}
+.ant .am{font-family:var(--cn); color:var(--ink2); font-size:14px}
+.mixn{font-size:13px; line-height:1.55; color:var(--blue); border-left:2px solid var(--blue); padding-left:10px}
+.mixn b{font-family:var(--kr); font-weight:600}
+.hanja{font-size:13px; line-height:1.55; color:var(--ink2)}
+.hanja b{font-family:var(--cn); color:var(--ink); font-size:15px}
+
+/* ---- actions ---- */
+.acts{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.act{
+  border:1px solid var(--ink); border-radius:3px; padding:13px 8px; background:var(--card);
+  display:flex; flex-direction:column; align-items:center; gap:2px; box-shadow:3px 3px 0 var(--shadow);
+  transition:transform .08s ease, box-shadow .08s ease;
+}
+.act:active{transform:translate(3px,3px); box-shadow:0 0 0 var(--shadow)}
+.act .kr{font-family:var(--kr); font-size:17px; font-weight:700}
+.act .cn{font-family:var(--cn); font-size:12px; color:var(--ink2)}
+.act.no{border-color:var(--seal); color:var(--seal)}
+.act.no .cn{color:var(--seal); opacity:.75}
+.act.yes{border-color:var(--ok); color:var(--ok)}
+.act.yes .cn{color:var(--ok); opacity:.75}
+.acts.hide{visibility:hidden}
+
+/* ---- done ---- */
+.done{background:var(--card); border:1px solid var(--ink); border-radius:3px; box-shadow:4px 4px 0 var(--shadow); padding:24px 20px; display:flex; flex-direction:column; gap:16px; text-align:center}
+.done .big{font-family:var(--kr); font-size:26px; font-weight:700}
+.done .sub{font-family:var(--cn); font-size:14px; color:var(--ink2); line-height:1.6}
+.misslist{display:flex; flex-wrap:wrap; gap:6px; justify-content:center}
+.misslist span{font-family:var(--kr); font-size:15px; border:1px solid var(--seal); color:var(--seal); border-radius:2px; padding:3px 9px}
+.done .acts{display:flex; gap:10px}
+.done .act{flex:1}
+.done .sub b{color:var(--seal)}
+
+/* ---- list ---- */
+.list{display:flex; flex-direction:column; gap:22px}
+.grp{display:flex; flex-direction:column; gap:0}
+.grph{font-family:var(--mono); font-size:10px; letter-spacing:.16em; color:var(--ink2); text-transform:uppercase; padding-bottom:7px; border-bottom:1px solid var(--ink); margin-bottom:2px}
+.item{display:grid; grid-template-columns:1fr auto; gap:4px 14px; align-items:baseline; padding:11px 2px; border-bottom:1px solid var(--line2); text-align:left; width:100%}
+.item:hover{background:var(--card)}
+.item .w{font-family:var(--kr); font-size:19px; font-weight:700; letter-spacing:-.01em}
+.item .w b{color:var(--seal); font-weight:700}
+.item .m{font-family:var(--cn); font-size:16px; font-weight:600}
+.item .f{font-family:var(--kr); font-size:13px; color:var(--ink2); grid-column:1}
+.item .r{font-family:var(--mono); font-size:10px; letter-spacing:.08em; color:var(--seal); text-align:right}
+.item .r.soft{color:var(--ink2)}
+.foot{font-size:11px; line-height:1.7; color:var(--ink2); font-family:var(--mono); text-align:center; border-top:1px solid var(--line); padding-top:12px}
+.hidden{display:none !important}
+
+@media (prefers-reduced-motion:reduce){
+  .card,.fill,.act{transition:none}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="t">형용사</span>
+      <span class="n" id="date">2026.08.07 · 1급</span>
+    </div>
+    <button class="viewbtn" id="toggleView">목록 一览</button>
+  </header>
+
+  <div class="bar" id="bar">
+    <div class="row" id="modes">
+      <span class="lab">방향</span>
+    </div>
+    <div class="row" id="filters">
+      <span class="lab">범위</span>
+    </div>
+  </div>
+
+  <div class="meter" id="meter">
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <span class="count" id="count">0 / 0</span>
+  </div>
+
+  <div class="stage" id="stage">
+    <button class="card" id="card" aria-live="polite">
+      <div class="face front" id="front"></div>
+      <div class="face back" id="back"></div>
+    </button>
+  </div>
+
+  <div class="acts" id="acts">
+    <button class="act no" id="btnNo"><span class="kr">몰라요</span><span class="cn">不会 · 排到后面</span></button>
+    <button class="act yes" id="btnYes"><span class="kr">알아요</span><span class="cn">会了 · 过</span></button>
+  </div>
+
+  <div class="done hidden" id="done"></div>
+  <div class="list hidden" id="list"></div>
+  <p class="foot" id="foot">탭 = 뒤집기 · SPACE 翻面 · ← 不会 · → 会了</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* 한국어문화교육원 1급 형용사 40 (2026-08-07 수업 유인물 2쪽) */
+var W = [
+ {k:"많다",ha:"많습니다",he:"많아요",md:"많은",c:"多",r:"규",p:1,a:"적다",pr:"만타"},
+ {k:"적다",ha:"적습니다",he:"적어요",md:"적은",c:"少",r:"규",p:1,a:"많다",pr:"적따",x:"작다",xn:"적다是<b>数量</b>少，작다是<b>体积</b>小"},
+ {k:"크다",ha:"큽니다",he:"커요",md:"큰",c:"大",r:"으",p:1,a:"작다",d:"크 + 어요 → ㅡ 탈락 → 커요"},
+ {k:"작다",ha:"작습니다",he:"작아요",md:"작은",c:"小",r:"규",p:1,a:"크다",pr:"작따",x:"적다",xn:"작다是<b>体积</b>小，적다是<b>数量</b>少"},
+ {k:"높다",ha:"높습니다",he:"높아요",md:"높은",c:"高",r:"규",p:1,a:"낮다",pr:"놉따"},
+ {k:"낮다",ha:"낮습니다",he:"낮아요",md:"낮은",c:"低",r:"규",p:1,a:"높다",pr:"낟따"},
+ {k:"넓다",ha:"넓습니다",he:"넓어요",md:"넓은",c:"宽",r:"규",p:1,a:"좁다",pr:"널따"},
+ {k:"좁다",ha:"좁습니다",he:"좁아요",md:"좁은",c:"窄",r:"규",p:1,a:"넓다",pr:"좁따",n:"收音是 ㅂ，但<b>规则变化</b>——不要写成 좁워요"},
+ {k:"덥다",ha:"덥습니다",he:"더워요",md:"더운",c:"热",r:"ㅂ",p:1,a:"춥다",u:"더우",x:"뜨겁다",xn:"덥다说<b>天气</b>热，뜨겁다说<b>东西</b>烫"},
+ {k:"춥다",ha:"춥습니다",he:"추워요",md:"추운",c:"冷",r:"ㅂ",p:1,a:"덥다",u:"추우",x:"차갑다",xn:"춥다说<b>天气</b>冷，차갑다说<b>东西</b>凉"},
+ {k:"쉽다",ha:"쉽습니다",he:"쉬워요",md:"쉬운",c:"容易",r:"ㅂ",p:1,a:"어렵다",u:"쉬우"},
+ {k:"어렵다",ha:"어렵습니다",he:"어려워요",md:"어려운",c:"难",r:"ㅂ",p:1,a:"쉽다",u:"어려우"},
+ {k:"두껍다",ha:"두껍습니다",he:"두꺼워요",md:"두꺼운",c:"厚",r:"ㅂ",p:1,a:"얇다",u:"두꺼우"},
+ {k:"얇다",ha:"얇습니다",he:"얇아요",md:"얇은",c:"薄",r:"규",p:1,a:"두껍다",pr:"얄따",x:"짧다",xn:"얇다是<b>厚度</b>薄，짧다是<b>长度</b>短"},
+ {k:"빠르다",ha:"빠릅니다",he:"빨라요",md:"빠른",c:"快",r:"르",p:1,a:"느리다",d:"빠르 + 아요 → ㄹ 덧생김 → 빨라요"},
+ {k:"느리다",ha:"느립니다",he:"느려요",md:"느린",c:"慢",r:"규",p:1,a:"빠르다"},
+ {k:"맛있다",ha:"맛있습니다",he:"맛있어요",md:"맛있는",c:"好吃",r:"있",p:1,a:"맛없다",pr:"마싣따"},
+ {k:"맛없다",ha:"맛없습니다",he:"맛없어요",md:"맛없는",c:"难吃",r:"있",p:1,a:"맛있다",pr:"마덥따",n:"发音是 [마<b>덥</b>따]，不是 [마섭따]"},
+ {k:"재미있다",ha:"재미있습니다",he:"재미있어요",md:"재미있는",c:"有趣",r:"있",p:1,a:"재미없다"},
+ {k:"재미없다",ha:"재미없습니다",he:"재미없어요",md:"재미없는",c:"无聊",r:"있",p:1,a:"재미있다"},
+
+ {k:"밝다",ha:"밝습니다",he:"밝아요",md:"밝은",c:"亮",r:"규",p:2,a:"어둡다",pr:"박따"},
+ {k:"어둡다",ha:"어둡습니다",he:"어두워요",md:"어두운",c:"暗",r:"ㅂ",p:2,a:"밝다",u:"어두우"},
+ {k:"비싸다",ha:"비쌉니다",he:"비싸요",md:"비싼",c:"贵",r:"규",p:2,a:"싸다",x:"싸다",xn:"비싸다=贵，싸다=便宜。多一个「비」反而<b>变贵</b>"},
+ {k:"싸다",ha:"쌉니다",he:"싸요",md:"싼",c:"便宜",r:"규",p:2,a:"비싸다",x:"비싸다",xn:"싸다=便宜，비싸다=贵"},
+ {k:"뜨겁다",ha:"뜨겁습니다",he:"뜨거워요",md:"뜨거운",c:"烫",r:"ㅂ",p:2,a:"차갑다",u:"뜨거우",x:"덥다",xn:"뜨겁다说<b>东西</b>烫（커피가 뜨거워요），덥다说<b>天气</b>"},
+ {k:"차갑다",ha:"차갑습니다",he:"차가워요",md:"차가운",c:"凉",r:"ㅂ",p:2,a:"뜨겁다",u:"차가우",x:"춥다",xn:"차갑다说<b>东西</b>凉（물이 차가워요），춥다说<b>天气</b>"},
+ {k:"무겁다",ha:"무겁습니다",he:"무거워요",md:"무거운",c:"重",r:"ㅂ",p:2,a:"가볍다",u:"무거우"},
+ {k:"가볍다",ha:"가볍습니다",he:"가벼워요",md:"가벼운",c:"轻",r:"ㅂ",p:2,a:"무겁다",u:"가벼우"},
+ {k:"시끄럽다",ha:"시끄럽습니다",he:"시끄러워요",md:"시끄러운",c:"吵",r:"ㅂ",p:2,a:"조용하다",u:"시끄러우"},
+ {k:"조용하다",ha:"조용합니다",he:"조용해요",md:"조용한",c:"安静",r:"하",p:2,a:"시끄럽다"},
+ {k:"길다",ha:"깁니다",he:"길어요",md:"긴",c:"长",r:"ㄹ",p:2,a:"짧다",d:"길 + ㅂ니다 → ㄹ 탈락 → 깁니다",n:"讲义上打 ★ 就是提醒这里：<b>깁니다</b>，不是 길습니다"},
+ {k:"짧다",ha:"짧습니다",he:"짧아요",md:"짧은",c:"短",r:"규",p:2,a:"길다",pr:"짤따",x:"얇다",xn:"짧다是<b>长度</b>短，얇다是<b>厚度</b>薄"},
+ {k:"멋있다",ha:"멋있습니다",he:"멋있어요",md:"멋있는",c:"帅",r:"있",p:2,a:"",pr:"머싣따"},
+ {k:"예쁘다",ha:"예쁩니다",he:"예뻐요",md:"예쁜",c:"漂亮",r:"으",p:2,a:"",d:"예쁘 + 어요 → ㅡ 탈락 → 예뻐요"},
+ {k:"아프다",ha:"아픕니다",he:"아파요",md:"아픈",c:"疼",r:"으",p:2,a:"",d:"아프 + 아요 → ㅡ 탈락 → 아파요"},
+ {k:"무섭다",ha:"무섭습니다",he:"무서워요",md:"무서운",c:"可怕",r:"ㅂ",p:2,a:"",u:"무서우"},
+ {k:"친절하다",ha:"친절합니다",he:"친절해요",md:"친절한",c:"亲切",r:"하",p:2,a:"",hj:"親切",hn:"全表<b>唯一</b>能用汉字外挂的词：친=親，절=切"},
+ {k:"귀엽다",ha:"귀엽습니다",he:"귀여워요",md:"귀여운",c:"可爱",r:"ㅂ",p:2,a:"",u:"귀여우"},
+ {k:"더럽다",ha:"더럽습니다",he:"더러워요",md:"더러운",c:"脏",r:"ㅂ",p:2,a:"깨끗하다",u:"더러우"},
+ {k:"깨끗하다",ha:"깨끗합니다",he:"깨끗해요",md:"깨끗한",c:"干净",r:"하",p:2,a:"더럽다",pr:"깨끄타다"}
+];
+
+var RULE = {
+  "ㅂ":{seal:"ㅂ", name:"ㅂ 불규칙", cn:"ㅂ 变 우"},
+  "으":{seal:"ㅡ", name:"ㅡ 탈락",  cn:"ㅡ 脱落"},
+  "르":{seal:"르", name:"르 불규칙", cn:"加 ㄹ"},
+  "ㄹ":{seal:"ㄹ", name:"ㄹ 탈락",  cn:"ㄹ 脱落"},
+  "하":{seal:"하", name:"하다 형용사", cn:"하다 类", soft:true},
+  "있":{seal:"있", name:"있다 · 관형형 -는", cn:"定语用 -는", soft:true},
+  "규":null
+};
+
+/* 派生：ㅂ 불규칙的推导过程从 u 生成，避免手写出错 */
+W.forEach(function(w){
+  if(w.r === "ㅂ" && !w.d) w.d = w.k.slice(0,-1) + " → " + w.u + " + 어요 → " + w.he;
+});
+var BY = {};
+W.forEach(function(w){ BY[w.k] = w; });
+
+var MODES = [
+  {id:"kc", label:"한 → 中", sub:"看韩语想意思"},
+  {id:"ck", label:"中 → 한", sub:"看中文想韩语"},
+  {id:"cj", label:"활용", sub:"看原形说 해요체"}
+];
+var FILTERS = [
+  {id:"all",  label:"전체",       kr:true,  f:function(){ return true; }},
+  {id:"irr",  label:"ㅂ 불규칙",   kr:true,  f:function(w){ return w.r === "ㅂ"; }},
+  {id:"vow",  label:"ㅡ·르·ㄹ",   kr:true,  f:function(w){ return w.r === "으" || w.r === "르" || w.r === "ㄹ"; }},
+  {id:"ha",   label:"하다·있다",   kr:true,  f:function(w){ return w.r === "하" || w.r === "있"; }},
+  {id:"mix",  label:"헷갈림 易混", kr:false, f:function(w){ return !!w.x; }},
+  {id:"p1",   label:"1쪽",        kr:true,  f:function(w){ return w.p === 1; }},
+  {id:"p2",   label:"2쪽",        kr:true,  f:function(w){ return w.p === 2; }},
+  {id:"weak", label:"약한 카드",   kr:true,  f:function(w){ return (stats[w.k] || 0) > 0; }}
+];
+
+var STORE = "adjCards_v1";
+var stats = {};
+try{ stats = JSON.parse(localStorage.getItem(STORE)) || {}; }catch(e){ stats = {}; }
+function persist(){ try{ localStorage.setItem(STORE, JSON.stringify(stats)); }catch(e){} }
+
+var mode = "kc", filter = "all", queue = [], pos = 0, total = 0, flipped = false, missed = [], listView = false;
+
+var $ = function(id){ return document.getElementById(id); };
+var el = {
+  modes:$("modes"), filters:$("filters"), fill:$("fill"), count:$("count"),
+  card:$("card"), front:$("front"), back:$("back"), acts:$("acts"),
+  done:$("done"), list:$("list"), stage:$("stage"), meter:$("meter"),
+  bar:$("bar"), foot:$("foot"), toggleView:$("toggleView")
+};
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function shuffle(arr){
+  for(var i = arr.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  }
+  return arr;
+}
+
+function pool(){
+  var fo = FILTERS.filter(function(x){ return x.id === filter; })[0];
+  return W.filter(fo.f);
+}
+
+function newRound(){
+  queue = shuffle(pool().slice());
+  total = queue.length; pos = 0; missed = []; flipped = false;
+  render();
+}
+
+/* ---------- chips ---------- */
+function buildChips(){
+  MODES.forEach(function(m){
+    var b = document.createElement("button");
+    b.className = "chip" + (m.id === mode ? " on" : "");
+    b.type = "button";
+    b.innerHTML = esc(m.label);
+    b.title = m.sub;
+    b.onclick = function(){ mode = m.id; flipped = false; rebuildChips(); render(); };
+    el.modes.appendChild(b);
+  });
+  FILTERS.forEach(function(f){
+    var n = W.filter(f.f).length;
+    if(f.id === "weak" && n === 0) return;
+    var b = document.createElement("button");
+    b.className = "chip" + (f.kr ? " kr" : "") + (f.id === filter ? " on" : "");
+    b.type = "button";
+    b.innerHTML = esc(f.label) + '<span class="c">' + n + "</span>";
+    b.onclick = function(){ filter = f.id; newRound(); rebuildChips(); };
+    el.filters.appendChild(b);
+  });
+}
+function rebuildChips(){
+  el.modes.innerHTML = '<span class="lab">방향</span>';
+  el.filters.innerHTML = '<span class="lab">범위</span>';
+  buildChips();
+}
+
+/* ---------- faces ---------- */
+function frontHTML(w, i){
+  var r = RULE[w.r];
+  /* 印章只在「한 → 中」出现：另外两个方向里它会泄题 */
+  var sealHTML = (mode !== "kc" || !r) ? "" :
+    '<span class="seal' + (r.soft ? " soft" : "") + '">' + esc(r.seal) + "</span>";
+  var body;
+  if(mode === "kc"){
+    body = '<div class="word' + (w.k.length > 3 ? " sm" : "") + '">' + esc(w.k) + "</div>";
+  }else if(mode === "ck"){
+    body = '<div class="mean">' + esc(w.c) + "</div>";
+  }else{
+    body = '<span class="ask">해요체는?</span>' +
+           '<div class="word' + (w.k.length > 3 ? " sm" : "") + '">' + esc(w.k) + "</div>";
+  }
+  return '<div class="corner"><span class="idx">' + (i + 1) + " / " + total + "</span>" + sealHTML + "</div>" +
+         '<div class="mid">' + body + "</div>" +
+         '<p class="hint">탭 · 翻面</p>';
+}
+
+function backHTML(w){
+  var r = RULE[w.r];
+  var h = '<div class="corner"><span class="idx">' + esc(w.k) + "</span>" +
+          (r ? '<span class="seal' + (r.soft ? " soft" : "") + '">' + esc(r.seal) + "</span>" : "") +
+          "</div>";
+
+  if(mode === "cj"){
+    h += '<div class="headline"><div class="answord"><em>' + esc(w.he) + "</em></div>" +
+         '<div class="pron">' + esc(w.c) + " · " + (r ? esc(r.name) : "규칙") + "</div></div>";
+  }else if(mode === "ck"){
+    h += '<div class="headline"><div class="answord">' + esc(w.k) + "</div>" +
+         (w.pr ? '<div class="pron">[' + esc(w.pr) + "]</div>" : "") + "</div>";
+  }else{
+    h += '<div class="headline"><div class="ansmean">' + esc(w.c) + "</div>" +
+         (w.pr ? '<div class="pron">[' + esc(w.pr) + "]</div>" : "") + "</div>";
+  }
+
+  h += '<div class="grid">' +
+       '<span class="k">합니다</span><span class="v">' + esc(w.ha) + "</span>" +
+       '<span class="k">해요</span><span class="v">' + esc(w.he) + "</span>" +
+       '<span class="k">관형</span><span class="v">' + esc(w.md) + " N</span>" +
+       "</div>";
+
+  if(w.d){
+    h += '<div class="deriv"><span class="rl">' + esc(r.name) + " · " + esc(r.cn) + "</span>" + esc(w.d) + "</div>";
+  }
+  if(w.a && BY[w.a]){
+    h += '<div class="ant"><span class="ar">↔</span><span class="aw">' + esc(w.a) +
+         '</span><span class="am">' + esc(BY[w.a].c) + "</span></div>";
+  }
+  if(w.xn) h += '<p class="mixn">vs <b>' + esc(w.x) + "</b>　" + w.xn + "</p>";
+  if(w.n)  h += '<p class="hanja">' + w.n + "</p>";
+  if(w.hn) h += '<p class="hanja"><b>' + esc(w.hj) + "</b>하다　" + w.hn + "</p>";
+  return h;
+}
+
+/* ---------- render ---------- */
+function render(){
+  if(listView) return;
+  el.fill.style.width = total ? (pos / total * 100) + "%" : "0%";
+  el.count.textContent = pos + " / " + total;
+
+  if(pos >= total){
+    el.stage.classList.add("hidden");
+    el.acts.classList.add("hidden");
+    el.done.classList.remove("hidden");
+    var uniq = missed.filter(function(v, i, s){ return s.indexOf(v) === i; });
+    el.done.innerHTML =
+      '<div class="big">' + (uniq.length ? "한 바퀴 끝!" : "다 맞았어요") + "</div>" +
+      '<p class="sub">' + total + " 张过完" +
+      (uniq.length ? "，其中 <b>" + uniq.length + "</b> 张标了「몰라요」——这些就是要拎回来重背的。" : "，这一轮全部记住了。") +
+      "</p>" +
+      (uniq.length ? '<div class="misslist">' + uniq.map(function(k){ return "<span>" + esc(k) + "</span>"; }).join("") + "</div>" : "") +
+      '<div class="acts">' +
+      (uniq.length ? '<button class="act no" id="againMiss"><span class="kr">틀린 것만</span><span class="cn">只练错的 ' + uniq.length + "</span></button>" : "") +
+      '<button class="act yes" id="againAll"><span class="kr">처음부터</span><span class="cn">整轮重来</span></button>' +
+      "</div>";
+    if($("againMiss")) $("againMiss").onclick = function(){
+      queue = shuffle(uniq.map(function(k){ return BY[k]; }));
+      total = queue.length; pos = 0; missed = []; flipped = false;
+      el.done.classList.add("hidden"); el.stage.classList.remove("hidden"); el.acts.classList.remove("hidden");
+      render();
+    };
+    $("againAll").onclick = newRound;
+    return;
+  }
+
+  el.done.classList.add("hidden");
+  el.stage.classList.remove("hidden");
+  el.acts.classList.remove("hidden");
+  var w = queue[pos];
+  el.card.classList.toggle("flip", flipped);
+  el.front.innerHTML = frontHTML(w, pos);
+  el.back.innerHTML = backHTML(w);
+  el.acts.classList.toggle("hide", !flipped);
+  el.card.setAttribute("aria-label", flipped ? w.k + " " + w.c : "카드 " + (pos + 1));
+}
+
+function flip(){ if(pos < total){ flipped = !flipped; render(); } }
+function answer(ok){
+  if(!flipped || pos >= total) return;
+  var w = queue[pos];
+  if(ok){
+    if(stats[w.k]) { stats[w.k] = Math.max(0, stats[w.k] - 1); if(!stats[w.k]) delete stats[w.k]; }
+    pos++;
+  }else{
+    stats[w.k] = (stats[w.k] || 0) + 1;
+    missed.push(w.k);
+    queue.push(w); total++;
+    pos++;
+  }
+  persist();
+  flipped = false;
+  render();
+}
+
+/* ---------- list ---------- */
+function buildList(){
+  el.list.innerHTML = "";
+  [1, 2].forEach(function(p){
+    var g = document.createElement("div");
+    g.className = "grp";
+    var head = document.createElement("div");
+    head.className = "grph";
+    head.textContent = p === 1 ? "1쪽 · 大小 高低 冷热 难易" : "2쪽 · 明暗 贵贱 轻重 外貌";
+    g.appendChild(head);
+    W.filter(function(w){ return w.p === p; }).forEach(function(w){
+      var r = RULE[w.r];
+      var b = document.createElement("button");
+      b.className = "item";
+      b.type = "button";
+      b.innerHTML =
+        '<span class="w">' + esc(w.k) + (w.r === "ㄹ" ? " <b>★</b>" : "") + "</span>" +
+        '<span class="m">' + esc(w.c) + "</span>" +
+        '<span class="f">' + esc(w.ha) + " · " + esc(w.he) + " · " + esc(w.md) + " N</span>" +
+        '<span class="r' + (!r || r.soft ? " soft" : "") + '">' + (r ? esc(r.name) : "규칙") + "</span>";
+      b.onclick = function(){
+        var i = queue.map(function(q){ return q.k; }).indexOf(w.k);
+        if(i < 0){ queue.splice(pos, 0, w); i = pos; total++; }
+        pos = i; flipped = false;
+        setView(false); render();
+      };
+      g.appendChild(b);
+    });
+    el.list.appendChild(g);
+  });
+}
+
+function setView(toList){
+  listView = toList;
+  el.list.classList.toggle("hidden", !toList);
+  el.stage.classList.toggle("hidden", toList);
+  el.acts.classList.toggle("hidden", toList);
+  el.meter.classList.toggle("hidden", toList);
+  el.bar.classList.toggle("hidden", toList);
+  el.done.classList.add("hidden");
+  el.foot.textContent = toList ? "탭해서 그 카드로 이동 · 点一行跳到那张卡" : "탭 = 뒤집기 · SPACE 翻面 · ← 不会 · → 会了";
+  el.toggleView.textContent = toList ? "카드 卡片" : "목록 一览";
+  if(toList) buildList(); else render();
+}
+
+/* ---------- wire ---------- */
+el.card.onclick = flip;
+$("btnNo").onclick = function(e){ e.stopPropagation(); answer(false); };
+$("btnYes").onclick = function(e){ e.stopPropagation(); answer(true); };
+el.toggleView.onclick = function(){ setView(!listView); };
+document.addEventListener("keydown", function(e){
+  if(listView) return;
+  if(e.key === " " || e.key === "Enter"){ e.preventDefault(); flip(); }
+  else if(e.key === "ArrowLeft"){ answer(false); }
+  else if(e.key === "ArrowRight"){ answer(true); }
+});
+
+buildChips();
+newRound();
+})();
+</script>
+</body>
+</html>
