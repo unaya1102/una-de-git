@@ -149,12 +149,12 @@ function clockSVG(h, m) {
   let ticks = '';
   for (let i = 0; i < 12; i++) {
     const [x1, y1] = pt(i * 30 - 90, 40), [x2, y2] = pt(i * 30 - 90, 44.5);
-    ticks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#17171B" stroke-width="${i % 3 === 0 ? 2 : 1}"/>`;
+    ticks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#232A21" stroke-width="${i % 3 === 0 ? 2 : 1}"/>`;
   }
-  return `<svg viewBox="0 0 100 100" class="clk"><circle cx="50" cy="50" r="46" fill="none" stroke="#17171B" stroke-width="1.6"/>${ticks}` +
-    `<line x1="50" y1="50" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}" stroke="#C33C22" stroke-width="3.6" stroke-linecap="round"/>` +
-    `<line x1="50" y1="50" x2="${mx.toFixed(1)}" y2="${my.toFixed(1)}" stroke="#2E5A8A" stroke-width="2.2" stroke-linecap="round"/>` +
-    `<circle cx="50" cy="50" r="2.6" fill="#17171B"/></svg>`;
+  return `<svg viewBox="0 0 100 100" class="clk"><circle cx="50" cy="50" r="46" fill="none" stroke="#232A21" stroke-width="1.6"/>${ticks}` +
+    `<line x1="50" y1="50" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}" stroke="#B0402A" stroke-width="3.6" stroke-linecap="round"/>` +
+    `<line x1="50" y1="50" x2="${mx.toFixed(1)}" y2="${my.toFixed(1)}" stroke="#2B5870" stroke-width="2.2" stroke-linecap="round"/>` +
+    `<circle cx="50" cy="50" r="2.6" fill="#232A21"/></svg>`;
 }
 
 const bubbles = id => `<span class="bub"><b>고</b><b>한</b></span>`;
@@ -241,42 +241,43 @@ HUNT.forEach(x => {
 });
 
 const CSS = `
-@page{size:A4;margin:11mm 10mm 9mm}
+@page{size:A4;margin:0}
+html,body{background:#DCE7DA;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 *{box-sizing:border-box}
-body{margin:0;font-family:'NanumBarunGothic','Nanum Gothic',sans-serif;color:#17171B;font-size:10.5pt;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;font-family:'NanumBarunGothic','Nanum Gothic',sans-serif;color:#232A21;font-size:10.5pt;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .cn3{font-family:'WenQuanYi Zen Hei',sans-serif}
-s{text-decoration:none;font-family:'WenQuanYi Zen Hei',sans-serif;color:#6B6971;font-size:8pt;margin-left:3pt}
-.page{page-break-after:always;display:flex;flex-direction:column;min-height:266mm}
+s{text-decoration:none;font-family:'WenQuanYi Zen Hei',sans-serif;color:#5E6659;font-size:8pt;margin-left:3pt}
+.page{page-break-after:always;display:flex;flex-direction:column;min-height:295mm;padding:11mm 10mm 9mm;background:#DCE7DA}
 .page:last-child{page-break-after:auto}
-.ph{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1.4pt solid #17171B;padding-bottom:3pt;margin-bottom:7pt}
+.ph{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1.4pt solid #232A21;padding-bottom:3pt;margin-bottom:7pt}
 .ph .t{font-size:17pt;font-weight:800;letter-spacing:-.02em}
-.ph .t b{color:#C33C22}
-.ph .m{font-size:8.5pt;color:#6B6971;font-family:'WenQuanYi Zen Hei',sans-serif}
-.lead{font-size:9pt;color:#3C3B42;font-family:'WenQuanYi Zen Hei',sans-serif;background:#F2F0EB;border-left:2.5pt solid #C33C22;padding:7pt 9pt;margin-bottom:10pt;line-height:1.5}
-.lead b{color:#C33C22}
-.sec{font-size:11.5pt;font-weight:800;margin:12pt 0 6pt;padding-bottom:2pt;border-bottom:.8pt solid #C9C6BE}
+.ph .t b{color:#B0402A}
+.ph .m{font-size:8.5pt;color:#5E6659;font-family:'WenQuanYi Zen Hei',sans-serif}
+.lead{font-size:9pt;color:#3B4438;font-family:'WenQuanYi Zen Hei',sans-serif;background:#D0DCCD;border-left:2.5pt solid #B0402A;padding:7pt 9pt;margin-bottom:10pt;line-height:1.5}
+.lead b{color:#B0402A}
+.sec{font-size:11.5pt;font-weight:800;margin:12pt 0 6pt;padding-bottom:2pt;border-bottom:.8pt solid #AFBCAB}
 .sec s{font-size:8.5pt}
-.timer{float:right;font-size:8.5pt;font-weight:400;color:#6B6971;font-family:'WenQuanYi Zen Hei',sans-serif}
+.timer{float:right;font-size:8.5pt;font-weight:400;color:#5E6659;font-family:'WenQuanYi Zen Hei',sans-serif}
 
 /* 판별 그리드 */
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
-.gcell{display:flex;align-items:center;gap:5pt;border-bottom:.5pt solid #DEDBD4;border-right:.5pt solid #DEDBD4;padding:4.6pt 7pt}
+.gcell{display:flex;align-items:center;gap:5pt;border-bottom:.5pt solid #C6D2C3;border-right:.5pt solid #C6D2C3;padding:4.6pt 7pt}
 .gcell:nth-child(3n){border-right:none}
-.gn{font-size:7.5pt;color:#A6A3AB;width:14pt;font-variant-numeric:tabular-nums}
+.gn{font-size:7.5pt;color:#98A394;width:14pt;font-variant-numeric:tabular-nums}
 .gu{font-size:14pt;font-weight:800;min-width:36pt}
-.gc{font-size:8pt;color:#6B6971;font-family:'WenQuanYi Zen Hei',sans-serif;flex:1}
+.gc{font-size:8pt;color:#5E6659;font-family:'WenQuanYi Zen Hei',sans-serif;flex:1}
 .bub{display:flex;gap:4pt}
-.bub b{width:17pt;height:17pt;border:1pt solid #17171B;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10pt;font-weight:700}
-.bub b:first-child{color:#C33C22;border-color:#C33C22}
-.bub b:last-child{color:#2E5A8A;border-color:#2E5A8A}
+.bub b{width:17pt;height:17pt;border:1pt solid #232A21;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10pt;font-weight:700}
+.bub b:first-child{color:#B0402A;border-color:#B0402A}
+.bub b:last-child{color:#2B5870;border-color:#2B5870}
 
 /* 쓰기 줄 */
-.wl{display:inline-block;border-bottom:.8pt solid #8E8B93;min-width:130pt;height:30pt;position:relative}
+.wl{display:inline-block;border-bottom:.8pt solid #8C9788;min-width:130pt;height:30pt;position:relative}
 .wl.grow{flex:1}
 .wl.wide{width:100%;margin-top:3pt}
 .wl.sm{min-width:60pt}
 .wl.fix{min-width:95pt;margin-left:auto}
-.wl i{position:absolute;left:1pt;bottom:1pt;font-style:normal;font-size:7pt;color:#BDBAC2}
+.wl i{position:absolute;left:1pt;bottom:1pt;font-style:normal;font-size:7pt;color:#AAB6A6}
 .row{display:flex;align-items:flex-end;gap:8pt;margin-bottom:8pt}
 .row.half{width:48%}
 .row.wide{width:100%}
@@ -288,33 +289,33 @@ s{text-decoration:none;font-family:'WenQuanYi Zen Hei',sans-serif;color:#6B6971;
 .clocks{display:grid;grid-template-columns:repeat(3,1fr);gap:14pt 14pt}
 .ccell{display:flex;flex-direction:column;align-items:center}
 .clk{width:80pt;height:80pt}
-.cn2{font-size:8pt;color:#6B6971;margin-top:1pt}
+.cn2{font-size:8pt;color:#5E6659;margin-top:1pt}
 
 /* 카페 */
-.menu{display:flex;flex-wrap:wrap;gap:4pt 12pt;font-size:9pt;color:#3C3B42;background:#F2F0EB;padding:5pt 7pt;margin-bottom:7pt}
+.menu{display:flex;flex-wrap:wrap;gap:4pt 12pt;font-size:9pt;color:#3B4438;background:#D0DCCD;padding:5pt 7pt;margin-bottom:7pt}
 .menu span b{font-weight:800}
 table{width:100%;border-collapse:collapse}
-th{font-size:8pt;color:#6B6971;text-align:left;border-bottom:1pt solid #17171B;padding:2pt 3pt;font-family:'WenQuanYi Zen Hei',sans-serif;font-weight:600}
-td{border-bottom:.5pt solid #DEDBD4;padding:7pt 4pt;vertical-align:bottom}
+th{font-size:8pt;color:#5E6659;text-align:left;border-bottom:1pt solid #232A21;padding:2pt 3pt;font-family:'WenQuanYi Zen Hei',sans-serif;font-weight:600}
+td{border-bottom:.5pt solid #C6D2C3;padding:7pt 4pt;vertical-align:bottom}
 .mn{font-size:11pt;font-weight:700;white-space:nowrap}
-.qt{font-size:13.5pt;font-weight:800;color:#C33C22;white-space:nowrap}
-.pr{font-size:11pt;color:#2E5A8A;font-variant-numeric:tabular-nums;white-space:nowrap}
-.tot{background:#F2F0EB}
-.tot td{font-weight:800;border-bottom:1.4pt solid #17171B}
+.qt{font-size:13.5pt;font-weight:800;color:#B0402A;white-space:nowrap}
+.pr{font-size:11pt;color:#2B5870;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tot{background:#D0DCCD}
+.tot td{font-weight:800;border-bottom:1.4pt solid #232A21}
 
 /* 받아쓰기 */
 .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 14pt}
 .dcell{display:flex;align-items:flex-end;gap:6pt;margin-bottom:7pt}
-.dn{font-size:8pt;color:#6B6971;width:24pt;font-variant-numeric:tabular-nums}
+.dn{font-size:8pt;color:#5E6659;width:24pt;font-variant-numeric:tabular-nums}
 /* 오류사냥 */
-.hrow{display:flex;align-items:flex-end;gap:6pt;border-bottom:.5pt solid #EDEBE6;padding:3.5pt 0}
+.hrow{display:flex;align-items:flex-end;gap:6pt;border-bottom:.5pt solid #D2DCCF;padding:3.5pt 0}
 .hrow .wl.fix{height:23pt}
-.hn{font-size:8pt;color:#6B6971;width:22pt}
+.hn{font-size:8pt;color:#5E6659;width:22pt}
 .hs{font-size:11pt;flex:1}
 /* 기록 */
 .rec{width:100%;margin-top:6pt}
-.rec td,.rec th{border:.6pt solid #C9C6BE;height:26pt;text-align:center;font-size:9pt}
-.foot{margin-top:auto;padding-top:8pt;display:flex;justify-content:space-between;font-size:7.5pt;color:#A6A3AB;border-top:.5pt solid #DEDBD4;padding-top:2pt}
+.rec td,.rec th{border:.6pt solid #AFBCAB;height:26pt;text-align:center;font-size:9pt}
+.foot{margin-top:auto;padding-top:8pt;display:flex;justify-content:space-between;font-size:7.5pt;color:#98A394;border-top:.5pt solid #C6D2C3;padding-top:2pt}
 `;
 
 function page(n, title, meta, lead, body) {
@@ -343,7 +344,7 @@ ${page(3, '③ 카페 주문서 <b>22</b>', '수량 = 고유어 · 금액 = 한�
    <div class="sec">거스름돈 <s>付 15万韩元，找零多少？</s></div>
    <div class="row"><span class="q">C${cg1}. <b>150,000원</b> 냈어요 → 거스름돈 <s>数字</s></span><span class="wl sm"><i>C${cg1}</i></span><span class="q"><s>读法</s></span><span class="wl grow"><i>C${cg2}</i></span></div>
    <div class="sec">소리 내어 <s>写完后把整张单子出声念一遍 —— 数字的瓶颈在发音速度，默读练不到</s></div>
-   <div style="font-size:8pt;color:#6B6971;font-family:'WenQuanYi Zen Hei',sans-serif">念完打勾：<span style="letter-spacing:6pt">☐☐☐</span> （念 3 遍，第 3 遍不看纸）</div>`)}
+   <div style="font-size:8pt;color:#5E6659;font-family:'WenQuanYi Zen Hei',sans-serif">念完打勾：<span style="letter-spacing:6pt">☐☐☐</span> （念 3 遍，第 3 遍不看纸）</div>`)}
 
 ${page(4, '④ 날짜 · 나이 · 번호 <b>22</b>', '날짜/번호 = 한자어 · 나이 = 고유어',
   '<b>两个不规则务必记住：6월 = 유월（不是 육월）、10월 = 시월（不是 십월）。</b>本页故意各放了两次。电话号码里的 0 念 <b>공</b>。',

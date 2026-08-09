@@ -8,22 +8,22 @@
 <body>
 <style>
 :root{
-  --paper:#E9E7E1; --card:#FCFBF9; --ink:#17171B; --ink2:#56555C;
-  --line:#C9C6BE; --line2:#DEDBD4; --nat:#C33C22; --sino:#2E5A8A;
-  --natbg:rgba(195,60,34,.10); --sinobg:rgba(46,90,138,.10); --shadow:rgba(23,23,27,.22);
+  --paper:#D7E3D5; --card:#E6ECE3; --ink:#232A21; --ink2:#5A6155;
+  --line:#B2C0AE; --line2:#CBD7C8; --nat:#B0402A; --sino:#2B5870;
+  --natbg:rgba(176,64,42,.10); --sinobg:rgba(43,88,112,.11); --shadow:rgba(35,42,33,.18);
   --kr:'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',system-ui,sans-serif;
   --cn:'Songti SC','Noto Serif CJK SC','Noto Serif SC',serif;
   --ui:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme:dark){
-  :root{--paper:#131315;--card:#1C1C20;--ink:#EAE8E2;--ink2:#93919A;--line:#34343A;--line2:#26262B;
-        --nat:#E4674A;--sino:#7FA9D6;--natbg:rgba(228,103,74,.14);--sinobg:rgba(127,169,214,.14);--shadow:rgba(0,0,0,.55)}
+  :root{--paper:#171C16;--card:#212720;--ink:#D5DDD2;--ink2:#8B948A;--line:#333B32;--line2:#272E26;
+        --nat:#DB6A4E;--sino:#7FA8C0;--natbg:rgba(219,106,78,.13);--sinobg:rgba(127,168,192,.15);--shadow:rgba(0,0,0,.5)}
 }
-:root[data-theme="dark"]{--paper:#131315;--card:#1C1C20;--ink:#EAE8E2;--ink2:#93919A;--line:#34343A;--line2:#26262B;
-  --nat:#E4674A;--sino:#7FA9D6;--natbg:rgba(228,103,74,.14);--sinobg:rgba(127,169,214,.14);--shadow:rgba(0,0,0,.55)}
-:root[data-theme="light"]{--paper:#E9E7E1;--card:#FCFBF9;--ink:#17171B;--ink2:#56555C;--line:#C9C6BE;--line2:#DEDBD4;
-  --nat:#C33C22;--sino:#2E5A8A;--natbg:rgba(195,60,34,.10);--sinobg:rgba(46,90,138,.10);--shadow:rgba(23,23,27,.22)}
+:root[data-theme="dark"]{--paper:#171C16;--card:#212720;--ink:#D5DDD2;--ink2:#8B948A;--line:#333B32;--line2:#272E26;
+  --nat:#DB6A4E;--sino:#7FA8C0;--natbg:rgba(219,106,78,.13);--sinobg:rgba(127,168,192,.15);--shadow:rgba(0,0,0,.5)}
+:root[data-theme="light"]{--paper:#D7E3D5;--card:#E6ECE3;--ink:#232A21;--ink2:#5A6155;--line:#B2C0AE;--line2:#CBD7C8;
+  --nat:#B0402A;--sino:#2B5870;--natbg:rgba(176,64,42,.10);--sinobg:rgba(43,88,112,.11);--shadow:rgba(35,42,33,.18)}
 
 *{box-sizing:border-box}
 .wrap{background:var(--paper);color:var(--ink);font-family:var(--ui);min-height:100dvh;margin:0 auto;
@@ -54,6 +54,7 @@ select{font-size:13px;padding:5px 8px;border:1px solid var(--line);background:va
 .dbtn .pl{font-family:var(--kr);font-size:15px;font-weight:700}
 .dbtn .ct{font-family:var(--mono);font-size:10px;color:var(--nat)}
 .dbtn.done{border-color:var(--line);box-shadow:none;opacity:.6}
+.dbtn.now{border-color:var(--nat);box-shadow:3px 3px 0 var(--nat);opacity:1}
 .dbtn .ans{font-family:var(--kr);font-size:14px;font-weight:600;color:var(--sino)}
 
 /* 무한 듣기 / 말하기 카드 */
@@ -103,9 +104,12 @@ select{font-size:13px;padding:5px 8px;border:1px solid var(--line);background:va
     </div>
     <div class="dgrid" id="dgrid"></div>
     <div class="row" style="margin-top:12px">
+      <button class="chip kr" id="auto">▶ 연속 재생 连续播放</button>
+      <button class="chip" id="gap">간격 8초</button>
       <button class="chip" id="reveal">정답 보기 显示答案</button>
       <button class="chip" id="resetC">횟수 초기화 重置次数</button>
     </div>
+    <p class="foot" style="border:none;padding-top:8px;text-align:left">连续播放时手不用离开笔，屏幕也不会自动锁。</p>
   </section>
 
   <!-- 무한 듣기 -->
@@ -231,20 +235,55 @@ function buildModes(){
   MODES.forEach(function(m){
     var b=document.createElement("button");
     b.className="chip kr"+(m.id===mode?" on":""); b.type="button"; b.textContent=m.label;
-    b.onclick=function(){mode=m.id;MODES.forEach(function(x){el(x.sec).classList.toggle("hidden",x.id!==mode);});buildModes();};
+    b.onclick=function(){
+      if(auto) stopAuto();
+      mode=m.id;MODES.forEach(function(x){el(x.sec).classList.toggle("hidden",x.id!==mode);});buildModes();
+    };
     el("modes").appendChild(b);
   });
 }
 
 /* ---------- 받아쓰기 ---------- */
 var counts={}, revealed=false;
+var auto=false, autoIdx=0, autoTimer=null, gap=8, wake=null;
 try{counts=JSON.parse(localStorage.getItem("dictCounts"))||{};}catch(e){counts={};}
+
+/* 연속 재생 중에는 화면이 꺼지지 않게 (아이패드에서 받아쓰기 도중 잠기는 걸 막는다) */
+var wantWake=false;
+function reqWake(){
+  if(!("wakeLock" in navigator)) return;
+  wantWake=true;
+  navigator.wakeLock.request("screen").then(function(w){
+    /* 요청이 끝나기 전에 정지했으면 바로 반납 — 안 그러면 락이 남는다 */
+    if(!wantWake){ try{ w.release(); }catch(e){} return; }
+    wake=w;
+  }).catch(function(){});
+}
+function relWake(){ wantWake=false; try{ if(wake){ wake.release(); wake=null; } }catch(e){} }
+document.addEventListener("visibilitychange",function(){
+  if(auto && document.visibilityState==="visible" && !wake) reqWake();
+});
+
+function stopAuto(){
+  auto=false; clearTimeout(autoTimer);
+  if(window.speechSynthesis) speechSynthesis.cancel();
+  relWake();
+  var b=el("auto"); b.textContent="▶ 연속 재생 连续播放"; b.classList.remove("on");
+  buildDict();
+}
+function stepAuto(){
+  if(!auto) return;
+  if(autoIdx>=DICT.length){ stopAuto(); return; }
+  buildDict();
+  speak(DICT[autoIdx].ko);
+  autoTimer=setTimeout(function(){ autoIdx++; stepAuto(); }, gap*1000);
+}
 function buildDict(){
   var g=el("dgrid"); g.innerHTML="";
   DICT.forEach(function(d,i){
     var n=i+1, c=counts[n]||0;
     var b=document.createElement("button");
-    b.className="dbtn"+(c>=3?" done":""); b.type="button";
+    b.className="dbtn"+(auto&&i===autoIdx?" now":c>=3?" done":""); b.type="button";
     b.innerHTML='<span class="id">E'+n+'</span>'+
       (revealed?'<span class="ans">'+d.ko+'</span><span class="id">'+d.cn+'</span>'
                :'<span class="pl">▶ 듣기</span><span class="ct">'+(c?c+" / 3":"&nbsp;")+'</span>');
@@ -256,7 +295,18 @@ function buildDict(){
     g.appendChild(b);
   });
 }
+el("auto").onclick=function(){
+  if(auto){ stopAuto(); return; }
+  auto=true; autoIdx=0; reqWake();
+  this.textContent="■ 정지 停止"; this.classList.add("on");
+  stepAuto();
+};
+el("gap").onclick=function(){
+  gap = gap===8 ? 12 : gap===12 ? 6 : 8;
+  this.textContent="간격 "+gap+"초";
+};
 el("reveal").onclick=function(){
+  if(auto) stopAuto();
   if(!revealed && !confirm("答案会全部显示出来。确定已经做完听写了吗？")) return;
   revealed=!revealed; this.textContent=revealed?"정답 숨기기 隐藏答案":"정답 보기 显示答案"; buildDict();
 };
