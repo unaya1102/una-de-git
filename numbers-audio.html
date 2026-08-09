@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>숫자 듣기 · 말하기</title>
+</head>
+<body>
+<style>
+:root{
+  --paper:#E9E7E1; --card:#FCFBF9; --ink:#17171B; --ink2:#56555C;
+  --line:#C9C6BE; --line2:#DEDBD4; --nat:#C33C22; --sino:#2E5A8A;
+  --natbg:rgba(195,60,34,.10); --sinobg:rgba(46,90,138,.10); --shadow:rgba(23,23,27,.22);
+  --kr:'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',system-ui,sans-serif;
+  --cn:'Songti SC','Noto Serif CJK SC','Noto Serif SC',serif;
+  --ui:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#131315;--card:#1C1C20;--ink:#EAE8E2;--ink2:#93919A;--line:#34343A;--line2:#26262B;
+        --nat:#E4674A;--sino:#7FA9D6;--natbg:rgba(228,103,74,.14);--sinobg:rgba(127,169,214,.14);--shadow:rgba(0,0,0,.55)}
+}
+:root[data-theme="dark"]{--paper:#131315;--card:#1C1C20;--ink:#EAE8E2;--ink2:#93919A;--line:#34343A;--line2:#26262B;
+  --nat:#E4674A;--sino:#7FA9D6;--natbg:rgba(228,103,74,.14);--sinobg:rgba(127,169,214,.14);--shadow:rgba(0,0,0,.55)}
+:root[data-theme="light"]{--paper:#E9E7E1;--card:#FCFBF9;--ink:#17171B;--ink2:#56555C;--line:#C9C6BE;--line2:#DEDBD4;
+  --nat:#C33C22;--sino:#2E5A8A;--natbg:rgba(195,60,34,.10);--sinobg:rgba(46,90,138,.10);--shadow:rgba(23,23,27,.22)}
+
+*{box-sizing:border-box}
+.wrap{background:var(--paper);color:var(--ink);font-family:var(--ui);min-height:100dvh;margin:0 auto;
+  padding:18px 16px calc(28px + env(safe-area-inset-bottom));max-width:620px;display:flex;flex-direction:column;gap:15px}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:none}
+button:focus-visible,select:focus-visible{outline:2px solid var(--nat);outline-offset:3px}
+
+.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.top .t{font-family:var(--kr);font-size:20px;font-weight:700}
+.top .n{font-family:var(--mono);font-size:11px;color:var(--ink2);letter-spacing:.06em}
+
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.lab{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--ink2);text-transform:uppercase;width:100%;margin-bottom:-2px}
+.chip{font-size:13px;padding:5px 11px;border:1px solid var(--line);border-radius:2px;color:var(--ink2);background:var(--card)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.chip.kr{font-family:var(--kr)}
+
+.warn{font-size:12.5px;line-height:1.6;color:var(--nat);border-left:2px solid var(--nat);background:var(--natbg);padding:8px 11px;border-radius:0 2px 2px 0}
+.warn b{font-weight:700}
+select{font-size:13px;padding:5px 8px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:2px;max-width:190px}
+
+/* 받아쓰기 그리드 */
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
+.dbtn{border:1px solid var(--ink);border-radius:3px;background:var(--card);box-shadow:3px 3px 0 var(--shadow);
+  padding:11px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .08s,box-shadow .08s}
+.dbtn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--shadow)}
+.dbtn .id{font-family:var(--mono);font-size:11px;color:var(--ink2);letter-spacing:.08em}
+.dbtn .pl{font-family:var(--kr);font-size:15px;font-weight:700}
+.dbtn .ct{font-family:var(--mono);font-size:10px;color:var(--nat)}
+.dbtn.done{border-color:var(--line);box-shadow:none;opacity:.6}
+.dbtn .ans{font-family:var(--kr);font-size:14px;font-weight:600;color:var(--sino)}
+
+/* 무한 듣기 / 말하기 카드 */
+.card{border:1px solid var(--ink);border-radius:3px;background:var(--card);box-shadow:4px 4px 0 var(--shadow);
+  padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:14px;min-height:230px;justify-content:center;text-align:center}
+.big{font-size:clamp(2.4rem,11vw,3.6rem);font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.05}
+.big.kr{font-family:var(--kr)}
+.ko{font-family:var(--kr);font-size:clamp(1.5rem,7vw,2.2rem);font-weight:700}
+.ko.n{color:var(--nat)} .ko.s{color:var(--sino)}
+.meaning{font-family:var(--cn);font-size:15px;color:var(--ink2)}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:2px}
+.tag.n{color:var(--nat);background:var(--natbg)} .tag.s{color:var(--sino);background:var(--sinobg)}
+.hidden{display:none!important}
+
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.act{border:1px solid var(--ink);border-radius:3px;padding:14px 8px;background:var(--card);box-shadow:3px 3px 0 var(--shadow);
+  display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .08s,box-shadow .08s}
+.act:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--shadow)}
+.act .kr{font-family:var(--kr);font-size:17px;font-weight:700}
+.act .cn{font-family:var(--cn);font-size:12px;color:var(--ink2)}
+.act.pri{border-color:var(--nat);color:var(--nat)} .act.pri .cn{color:var(--nat);opacity:.75}
+.foot{font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--ink2);text-align:center;border-top:1px solid var(--line);padding-top:12px}
+@media (prefers-reduced-motion:reduce){.act,.dbtn{transition:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="t">숫자 듣기 · 말하기</span>
+    <span class="n">워크시트 ⑤ 짝</span>
+  </header>
+
+  <div class="row" id="modes"><span class="lab">모드</span></div>
+
+  <div class="row">
+    <span class="lab">목소리 · 속도</span>
+    <select id="voice"></select>
+    <button class="chip" id="rate">속도 1.0×</button>
+    <button class="chip" id="test">소리 확인</button>
+  </div>
+  <div class="warn hidden" id="novoice"></div>
+
+  <!-- 받아쓰기 -->
+  <section id="secDict">
+    <div class="warn" style="margin-bottom:12px">
+      配合工作纸第 ⑤ 页用。点一格念一句，<b>最多听 3 遍</b>，听不出就空着——空着比乱猜有用。<br>
+      答案默认藏起来，做完再开。
+    </div>
+    <div class="dgrid" id="dgrid"></div>
+    <div class="row" style="margin-top:12px">
+      <button class="chip" id="reveal">정답 보기 显示答案</button>
+      <button class="chip" id="resetC">횟수 초기화 重置次数</button>
+    </div>
+  </section>
+
+  <!-- 무한 듣기 -->
+  <section id="secInf" class="hidden">
+    <div class="warn" style="margin-bottom:12px">
+      无限生成，练到不用想为止。<b>先听，在纸上或心里说出数字，再翻答案。</b>
+    </div>
+    <div class="row" id="cats" style="margin-bottom:12px"><span class="lab">범위</span></div>
+    <div class="card" id="infCard"></div>
+    <div class="acts" style="margin-top:10px">
+      <button class="act pri" id="infPlay"><span class="kr">다시 듣기</span><span class="cn">再听一遍</span></button>
+      <button class="act" id="infNext"><span class="kr">다음</span><span class="cn">下一个</span></button>
+    </div>
+  </section>
+
+  <!-- 말하기 -->
+  <section id="secSpeak" class="hidden">
+    <div class="warn" style="margin-bottom:12px">
+      看到数字<b>先出声读出来</b>，再点「모범 답안」听标准读法对比。<br>
+      数字的瓶颈在发音速度——默读练不到，必须出声。
+    </div>
+    <div class="row" id="cats2" style="margin-bottom:12px"><span class="lab">범위</span></div>
+    <div class="card" id="spCard"></div>
+    <div class="acts" style="margin-top:10px">
+      <button class="act pri" id="spModel"><span class="kr">모범 답안</span><span class="cn">听标准读法</span></button>
+      <button class="act" id="spNext"><span class="kr">다음</span><span class="cn">下一个</span></button>
+    </div>
+  </section>
+
+  <p class="foot" id="foot">시 = 고유어 · 분 = 한자어　|　6월 = 유월 · 10월 = 시월</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- 수 읽기 ---------- */
+var SD=["","일","이","삼","사","오","육","칠","팔","구"];
+function sino4(n){var o="",th=Math.floor(n/1000),h=Math.floor(n/100)%10,t=Math.floor(n/10)%10,u=n%10;
+  if(th)o+=(th>1?SD[th]:"")+"천"; if(h)o+=(h>1?SD[h]:"")+"백"; if(t)o+=(t>1?SD[t]:"")+"십"; if(u)o+=SD[u]; return o;}
+function sino(n){if(n===0)return "영";var p=[],man=Math.floor(n/10000),r=n%10000;
+  if(man)p.push((man===1?"":sino4(man))+"만"); if(r)p.push(sino4(r)); return p.join(" ");}
+var NO=["","한","두","세","네","다섯","여섯","일곱","여덟","아홉"];
+var NT=["","열","","서른","마흔","쉰","예순","일흔","여든","아흔"];
+function nat(n){var t=Math.floor(n/10),u=n%10;var s=t===2?(u===0?"스무":"스물"):NT[t];return s+NO[u];}
+var MONTH=["","일월","이월","삼월","사월","오월","유월","칠월","팔월","구월","시월","십일월","십이월"];
+var ri=function(a,b){return a+Math.floor(Math.random()*(b-a+1));};
+
+/* ---------- 받아쓰기 20 (워크시트 E1–E20과 동일) ---------- */
+var DICT=[
+ {ko:"세 시 십오 분",cn:"3:15"},{ko:"스물다섯 살",cn:"25岁"},
+ {ko:"만 이천 원",cn:"12,000韩元"},{ko:"아홉 개",cn:"9个"},
+ {ko:"유월 십사 일",cn:"6月14日"},{ko:"네 시간 삼십 분",cn:"4小时30分"},
+ {ko:"서른두 명",cn:"32人"},{ko:"십오 층",cn:"15层"},
+ {ko:"두 잔",cn:"2杯"},{ko:"시월 구 일",cn:"10月9日"},
+ {ko:"칠만 오천 원",cn:"75,000韩元"},{ko:"열두 시 오십 분",cn:"12:50"},
+ {ko:"삼 개월",cn:"3个月"},{ko:"다섯 마리",cn:"5只"},
+ {ko:"이천이십육 년",cn:"2026年"},{ko:"스무 개",cn:"20个"},
+ {ko:"여섯 시 오 분",cn:"6:05"},{ko:"백삼십 페이지",cn:"130页"},
+ {ko:"아흔아홉 살",cn:"99岁"},{ko:"팔십 퍼센트",cn:"80%"}
+];
+
+/* ---------- 무한 생성 ---------- */
+var NCOUNT=[["개","个"],["명","人"],["마리","只"],["잔","杯"],["병","瓶"],["권","本"],["장","张"],["조각","块"]];
+var CATS=[
+ {id:"time",label:"시간",kr:true,gen:function(){var h=ri(1,12),m=ri(0,11)*5;
+   return {show:h+":"+String(m).padStart(2,"0"),ko:nat(h)+" 시"+(m?" "+sino(m)+" 분":""),cn:"点钟=固有词 / 分钟=汉字词",side:"mix"};}},
+ {id:"age",label:"나이",kr:true,gen:function(){var n=ri(1,99);return {show:n+"살",ko:nat(n)+" 살",cn:"年龄=固有词",side:"n"};}},
+ {id:"count",label:"개수",kr:true,gen:function(){var n=ri(1,99),c=NCOUNT[ri(0,NCOUNT.length-1)];
+   return {show:n+c[0],ko:nat(n)+" "+c[0],cn:"数量="+c[1]+"，固有词",side:"n"};}},
+ {id:"money",label:"돈",kr:true,gen:function(){var n=ri(1,199)*ri(1,5)*100;
+   return {show:n.toLocaleString()+"원",ko:sino(n)+" 원",cn:"金额=汉字词，按「万」进位",side:"s"};}},
+ {id:"date",label:"날짜",kr:true,gen:function(){var m=ri(1,12),d=ri(1,28);
+   return {show:m+"월 "+d+"일",ko:MONTH[m]+" "+sino(d)+" 일",cn:"日期=汉字词"+(m===6||m===10?"（不规则！）":""),side:"s"};}},
+ {id:"misc",label:"층·번호",kr:true,gen:function(){
+   var k=ri(0,2);
+   if(k===0){var f=ri(1,30);return {show:f+"층",ko:sino(f)+" 층",cn:"楼层=汉字词",side:"s"};}
+   if(k===1){var p=ri(1,300);return {show:p+"페이지",ko:sino(p)+" 페이지",cn:"页数=汉字词",side:"s"};}
+   var t=ri(1,9),mm=ri(0,11)*5;return {show:t+"시간 "+mm+"분",ko:nat(t)+" 시간"+(mm?" "+sino(mm)+" 분":""),cn:"时长=固有词+汉字词",side:"mix"};}}
+];
+
+/* ---------- TTS ---------- */
+var voices=[], voice=null, rate=1.0;
+var el=function(id){return document.getElementById(id);};
+function loadVoices(){
+  voices=(window.speechSynthesis?speechSynthesis.getVoices():[]).filter(function(v){return /^ko/i.test(v.lang);});
+  var sel=el("voice"); sel.innerHTML="";
+  if(!voices.length){
+    el("novoice").classList.remove("hidden");
+    el("novoice").innerHTML="<b>没找到韩语语音。</b>iPhone/iPad：设置 → 辅助功能 → 朗读内容 → 声音 → 添加「한국어」。装好后回来刷新本页。";
+    sel.innerHTML="<option>—</option>"; return;
+  }
+  el("novoice").classList.add("hidden");
+  voices.forEach(function(v,i){var o=document.createElement("option");o.value=i;o.textContent=v.name;sel.appendChild(o);});
+  var saved=localStorage.getItem("koVoice");
+  var idx=voices.findIndex(function(v){return v.name===saved;});
+  sel.value=idx>=0?idx:0; voice=voices[sel.value];
+}
+if(window.speechSynthesis){
+  loadVoices();
+  speechSynthesis.onvoiceschanged=loadVoices;
+}else{
+  el("novoice").classList.remove("hidden");
+  el("novoice").textContent="这个浏览器不支持语音合成，请用 Safari 或 Chrome 打开。";
+}
+el("voice").onchange=function(){voice=voices[this.value];if(voice)localStorage.setItem("koVoice",voice.name);};
+el("rate").onclick=function(){rate=rate===1.0?0.8:rate===0.8?0.6:1.0;this.textContent="속도 "+rate.toFixed(1)+"×";};
+el("test").onclick=function(){speak("한국어 숫자 듣기 연습");};
+
+function speak(text){
+  if(!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(text);
+  u.lang="ko-KR"; u.rate=rate; if(voice)u.voice=voice;
+  speechSynthesis.speak(u);
+}
+
+/* ---------- 모드 ---------- */
+var MODES=[{id:"dict",label:"받아쓰기",sec:"secDict"},{id:"inf",label:"무한 듣기",sec:"secInf"},{id:"speak",label:"말하기",sec:"secSpeak"}];
+var mode="dict";
+function buildModes(){
+  el("modes").innerHTML='<span class="lab">모드</span>';
+  MODES.forEach(function(m){
+    var b=document.createElement("button");
+    b.className="chip kr"+(m.id===mode?" on":""); b.type="button"; b.textContent=m.label;
+    b.onclick=function(){mode=m.id;MODES.forEach(function(x){el(x.sec).classList.toggle("hidden",x.id!==mode);});buildModes();};
+    el("modes").appendChild(b);
+  });
+}
+
+/* ---------- 받아쓰기 ---------- */
+var counts={}, revealed=false;
+try{counts=JSON.parse(localStorage.getItem("dictCounts"))||{};}catch(e){counts={};}
+function buildDict(){
+  var g=el("dgrid"); g.innerHTML="";
+  DICT.forEach(function(d,i){
+    var n=i+1, c=counts[n]||0;
+    var b=document.createElement("button");
+    b.className="dbtn"+(c>=3?" done":""); b.type="button";
+    b.innerHTML='<span class="id">E'+n+'</span>'+
+      (revealed?'<span class="ans">'+d.ko+'</span><span class="id">'+d.cn+'</span>'
+               :'<span class="pl">▶ 듣기</span><span class="ct">'+(c?c+" / 3":"&nbsp;")+'</span>');
+    b.onclick=function(){
+      counts[n]=(counts[n]||0)+1;
+      try{localStorage.setItem("dictCounts",JSON.stringify(counts));}catch(e){}
+      speak(d.ko); buildDict();
+    };
+    g.appendChild(b);
+  });
+}
+el("reveal").onclick=function(){
+  if(!revealed && !confirm("答案会全部显示出来。确定已经做完听写了吗？")) return;
+  revealed=!revealed; this.textContent=revealed?"정답 숨기기 隐藏答案":"정답 보기 显示答案"; buildDict();
+};
+el("resetC").onclick=function(){counts={};try{localStorage.removeItem("dictCounts");}catch(e){}buildDict();};
+
+/* ---------- 무한 듣기 / 말하기 ---------- */
+var cat="time", cat2="time", infItem=null, spItem=null, infShown=false;
+function buildCats(host,cur,set){
+  el(host).innerHTML='<span class="lab">범위</span>';
+  CATS.concat([{id:"all",label:"전체 섞기",kr:true}]).forEach(function(c){
+    var b=document.createElement("button");
+    b.className="chip kr"+(c.id===cur?" on":""); b.type="button"; b.textContent=c.label;
+    b.onclick=function(){set(c.id);};
+    el(host).appendChild(b);
+  });
+}
+function genFrom(id){
+  var pool=id==="all"?CATS:CATS.filter(function(c){return c.id===id;});
+  return pool[ri(0,pool.length-1)].gen();
+}
+function sideTag(s){
+  if(s==="n") return '<span class="tag n">고유어</span>';
+  if(s==="s") return '<span class="tag s">한자어</span>';
+  return '<span class="tag n">고유어</span> <span class="tag s">한자어</span>';
+}
+function renderInf(){
+  el("infCard").innerHTML = infShown
+    ? '<div class="ko '+(infItem.side==="s"?"s":"n")+'">'+infItem.ko+'</div>'+
+      '<div class="big">'+infItem.show+'</div><div class="meaning">'+infItem.cn+'</div><div>'+sideTag(infItem.side)+'</div>'
+    : '<div class="ko n">▶</div><div class="meaning">听完在心里说出数字，再点下面翻开</div>'+
+      '<button class="chip" id="infShow" style="font-family:var(--kr);font-size:15px;padding:8px 16px">정답 보기</button>';
+  if(el("infShow")) el("infShow").onclick=function(){infShown=true;renderInf();};
+}
+function nextInf(){infItem=genFrom(cat);infShown=false;renderInf();speak(infItem.ko);}
+el("infPlay").onclick=function(){if(infItem)speak(infItem.ko);};
+el("infNext").onclick=nextInf;
+
+function renderSp(){
+  el("spCard").innerHTML='<div class="big'+(/[가-힣]/.test(spItem.show)?" kr":"")+'">'+spItem.show+'</div>'+
+    '<div class="meaning">先出声读，再听标准</div><div>'+sideTag(spItem.side)+'</div>';
+}
+function nextSp(){spItem=genFrom(cat2);renderSp();}
+el("spModel").onclick=function(){if(spItem)speak(spItem.ko);};
+el("spNext").onclick=nextSp;
+
+function setCat(id){ cat=id; buildCats("cats",cat,setCat); nextInf(); }
+function setCat2(id){ cat2=id; buildCats("cats2",cat2,setCat2); nextSp(); }
+
+buildModes(); buildDict();
+buildCats("cats",cat,setCat);
+buildCats("cats2",cat2,setCat2);
+infItem=genFrom(cat); infShown=false; renderInf();
+spItem=genFrom(cat2); renderSp();
+})();
+</script>
+</body>
+</html>
